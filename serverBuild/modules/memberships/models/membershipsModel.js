@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var database = require('../../../../database/database');
+var database = require('../../utility/controller/queryConnection');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 process.env.SECRET_KEY = 'varunv';

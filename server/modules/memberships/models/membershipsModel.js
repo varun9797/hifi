@@ -43,7 +43,6 @@ class UserModel {
         });
 })
 
-
     registerUser= (req, res) => new Promise((resolve, reject)=>{
         var today = new Date();
         var appData = {
