@@ -6,13 +6,14 @@
 // connection.connect();
 
 var mysql = require('mysql');
+require('dotenv').config();
 
 var connection = mysql.createPool({
     connectionLimit: 100,
-    host:'betterworld.cqdt99obscjn.us-east-1.rds.amazonaws.com',
-    user:'verma9797',
-    password:'qwer#123',
-    database:'dev_society',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     port: 3306,
     debug: false,
     multipleStatements: true

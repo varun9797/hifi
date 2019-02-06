@@ -5,8 +5,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 const bodyParser = require('body-parser');
-var members = require('./serverBuild/modules/memberships/routes/membershipsRouter');
-var memberships = require('./serverBuild/modules/members/routes/membersRouter');
+var memberships = require('./serverBuild/modules/memberships/routes/membershipsRouter');
+var  members = require('./serverBuild/modules/members/routes/membersRouter');
+require('dotenv').config();
 
 
 var app = express();

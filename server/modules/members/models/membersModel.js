@@ -9,66 +9,61 @@ class SocietyModel {
         this.queryMediator = new QueryMediator();
     }
 
-    
-    getOwner = (req, searchData) => new Promise((resolve, reject) => {
-        let query = `select ownerid from owner where phonenumber = ${searchData[0]} and email = \'${searchData[1]}\' `;
+
+    registerRole = (req) => new Promise((resolve, reject) => {
+        let query = `insert into role(roleName) values('${req.body.roleName.toLowerCase()}');`;
         this.queryMediator.queryConnection(query).then((result) => {
-            console.log('getOwner : Ok ');
+            console.log('Building is successfully Inserted: Ok ');
             resolve(result);
         }).catch((err) => {
             console.log('got query error ', err);
             reject(err);
         });
-    })
+    });
 
-    getOwnerList = (req) => new Promise((resolve, reject) => {
-        var societyIds = (req.body.societyIds && req.body.societyIds.length > 0) ? `'${req.body.societyIds}'` : null;
-        var buildingNames = (req.body.buildingNames && req.body.buildingNames.length > 0) ? `'${req.body.buildingNames}'` : null;
-        var flatIds = (req.body.flatIds && req.body.flatIds.length > 0) ? `'${req.body.flatIds}'` : null;
-
-        let query = `call get_owner_details(${societyIds}, ${buildingNames}, ${flatIds})`;
-        console.log(`call get_owner_details(${societyIds}, ${buildingNames}, ${flatIds})`);
+    registerPlan = (req) => new Promise((resolve, reject) => {
+        let query = `insert into plan(planName, planDisplayName, createdBy) values('${req.body.planName}', '${req.body.planDisplayName}', ${req.body.createdBy});`;
         this.queryMediator.queryConnection(query).then((result) => {
-            console.log('getOwnerList : Ok ');
+            console.log('Building is successfully Inserted: Ok ');
             resolve(result);
         }).catch((err) => {
             console.log('got query error ', err);
             reject(err);
         });
-    })
+    });
 
-    updateFlat = (req, searchData, updateValue) => new Promise((resolve, reject) => {
-        console.log('searchData is ', searchData);
-        console.log('update value is ', updateValue);
-
-        let query = `update flat set ownerid = ${updateValue} where societyid = ${searchData[0]} and buildingname = '${searchData[1]}' and flatname = '${searchData[2]}'`;
+    registerMember = (req) => new Promise((resolve, reject) => {
+        let query = `insert into member(firstName, middleName, lastName, mobileNumber, dateOfBirth, gender, address, city, area, emailId, username, password, RoleId, createdBy) values('${req.body.firstName.toLowerCase()}', '${req.body.middleName.toLowerCase()}', '${req.body.lastName.toLowerCase()}', ${req.body.mobileNumber}, '${req.body.dateOfBirth}', '${req.body.gender.toLowerCase()}', '${req.body.address}', '${req.body.city.toLowerCase()}', '${req.body.area.toLowerCase()}', '${req.body.emailId}', '${req.body.username.toLowerCase()}', '${req.body.password}', ${req.body.RoleId}, ${req.body.createdBy});`;
         this.queryMediator.queryConnection(query).then((result) => {
-            console.log('updateFlat : Ok ');
+            console.log('Building is successfully Inserted: Ok ');
             resolve(result);
         }).catch((err) => {
             console.log('got query error ', err);
-            console.log(`query is ------------ update flat set ownerid = ${updateValue} where societyid = ${searchData[0]} and buildingname = ${searchData[1]} and flatname = ${searchData[2]}`);
             reject(err);
         });
-    })
+    });
 
-    registerOwner = async (req) => {
-        var flatData = [req.body.societyId, req.body.buildingName, req.body.flatNumber];
-        var ownerSearchData = [req.body.phoneNumber, req.body.email];
-        var ownerInsertData = [[req.body.ownerName, req.body.isAdmin, req.body.phoneNumber, req.body.email, req.body.age, req.body.gender, req.body.password]];
-
-        let query = 'insert into owner(ownername,isadmin,phonenumber,email, age, gender, password) values ?';
-        try {
-            await this.queryMediator.queryConnection(query, ownerInsertData);
-            let fetchOwnerResponse = await this.getOwner(null, ownerSearchData);
-            let insertMappingResponse = await this.updateFlat(null, flatData, fetchOwnerResponse.dbResponse[0].ownerid);
-            console.log('Owner Registered Successfully: Ok');
-            return insertMappingResponse;
-        } catch (err) {
+    registerMembership = (req) => new Promise((resolve, reject) => {
+        let query = `insert into memberShip(MemberId, PlanId, allocatedOn, startTime, endTime, createdBy) values(${req.body.MemberId}, ${req.body.PlanId}, '${req.body.allocatedOn}', '${req.body.startTime}', '${req.body.endTime}' , ${req.body.createdBy});`;
+        this.queryMediator.queryConnection(query).then((result) => {
+            console.log('Building is successfully Inserted: Ok ');
+            resolve(result);
+        }).catch((err) => {
             console.log('got query error ', err);
-            return err;
-        }
-    }
+            reject(err);
+        });
+    });
+
+    updateMember = (req) => new Promise((resolve, reject) => {
+        let query = `UPDATE member SET firstName = '${req.body.firstName}', middleName = '${req.body.middleName}', lastName = '${req.body.lastName}', mobileNumber = ${req.body.mobileNumber}, dateOfBirth = '${req.body.dateOfBirth}', gender = '${req.body.gender}', address = '${req.body.address}', city = '${req.body.city}', area = '${req.body.area}', emailId = '${req.body.emailId}', RoleId = ${req.body.RoleId}, updatedAt = now() WHERE idmember = ${req.body.idmember};`;
+        this.queryMediator.queryConnection(query).then((result) => {
+            console.log('Building is successfully Inserted: Ok ');
+            resolve(result);
+        }).catch((err) => {
+            console.log('got query error ', err);
+            reject(err);
+        });
+    });
 
     getDetails = (req) => new Promise((resolve, reject) => {
         console.log('req.params.tableName', req.params.tableName);
@@ -93,109 +88,6 @@ class SocietyModel {
             reject(err);
         });
     })
-
-    updatePendingPaymentOfFlat = (req) => new Promise((resolve, reject) => {
-        console.log('req.params.tableName', req.params.tableName);
-
-        let query = `update flat set pendingpayment = '${req.body.pendingPayment}' where ownerid =${req.body.ownerid} and flatId =${req.body.flatid}`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('pending payment successfully updated : Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    })
-
-    updatePaymentHistory = (req) => new Promise((resolve, reject) => {
-        const currentDate = new Date();
-
-        let query = `insert into paymenthistory(flatid,paid,createddate,updateddate,ownerid) values (${req.body.flatid},${req.body.pendingPayment},'${currentDate.toISOString().replace(/([^T]+)T([^\.]+).*/g, '$1 $2')}','${currentDate.toISOString().replace(/([^T]+)T([^\.]+).*/g, '$1 $2')}',${req.body.ownerid});`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('pending payment history successfully updated : Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    });
-
-    registerBuilding = (req) => new Promise((resolve, reject) => {
-        let query = `insert into building(buildingname, societyid) values('${req.body.buildingName}',${req.body.societyid});`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('Building is successfully Inserted: Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    });
-
-    registerSociety = (req) => new Promise((resolve, reject) => {
-        let query = `insert into society(societyName, address, pincode) values ('${req.body.societyName}', '${req.body.address}', '${req.body.pincode}');`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('Society is successfully Inserted : Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    });
-
-    registerFlat = (req) => new Promise((resolve, reject) => {
-        let query = `insert into flat(flatname, buildingname, societyid) values ('${req.body.flatName}', '${req.body.buildingName}', ${req.body.societyId});`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('Flat is successfully Inserted : Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    });
-
-    updateBuilding = (req) => new Promise((resolve, reject) => {
-        let query = `insert into building(buildingname, societyid) values('${req.body.buildingName}',${req.body.societyid});`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('Building is successfully Updated: Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    });
-
-    updateSociety = (req) => new Promise((resolve, reject) => {
-        let query = `insert into society(societyName, address, pincode) values ('${req.body.societyName}', '${req.body.address}', '${req.body.pincode}');`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('Society is successfully Updated : Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    });
-
-    updateFlat = (req) => new Promise((resolve, reject) => {
-        let query = `insert into flat(flatname, buildingname, societyid) values ('${req.body.flatName}', '${req.body.buildingName}', ${req.body.societyId});`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('Flat is successfully Updated : Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    });
-
-    updateOwner = (req) => new Promise((resolve, reject) => {
-        let query = `insert into flat(flatname, buildingname, societyid) values ('${req.body.flatName}', '${req.body.buildingName}', ${req.body.societyId});`;
-        this.queryMediator.queryConnection(query).then((result) => {
-            console.log('Flat is successfully Updated : Ok ');
-            resolve(result);
-        }).catch((err) => {
-            console.log('got query error ', err);
-            reject(err);
-        });
-    });
 
     deleteRow = (req) => new Promise((resolve, reject) => {
         let query = `delete from ${req.body.tableName} where ${req.body.columnName} = ${req.body.columnValue}`;
